@@ -2,11 +2,16 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { getFetchAllManufacturers } from '../../actions/manufacturer.list.actions';
-import { getManufacturerListArray } from '../../selectors/manufacturer.list.selector';
-import { IndexRange, InfiniteLoader, List } from 'react-virtualized';
+import {
+    getManufacturerListArray, getManufacturerCurrentPage
+} from '../../selectors/manufacturer.list.selector';
+import {
+    IndexRange, InfiniteLoader, List, AutoSizer, InfiniteLoaderChildProps, Index, ListRowProps,
+} from 'react-virtualized';
 import 'react-virtualized/styles.css'; // only needs to be imported once
 import { Button, Grid } from '@material-ui/core';
 import { Link } from 'react-router-dom';
+import { getManufacturerDetailsByName } from '../../actions/manufacturer.detail.actions';
 
 export interface IManufacturerListPageProps {}
 
@@ -14,6 +19,9 @@ const ManufacturerListPage = (props: IManufacturerListPageProps) => {
     
     const dispatch = useDispatch();
     const manufacturers = useSelector(getManufacturerListArray);
+    const currentPage = useSelector(getManufacturerCurrentPage);
+    const totalManufacturers = manufacturers?.length;
+    const totalLimit = totalManufacturers ? (totalManufacturers - 20) : 0;
 
     React.useEffect(() => {
         if (!manufacturers) {
@@ -23,21 +31,20 @@ const ManufacturerListPage = (props: IManufacturerListPageProps) => {
         manufacturers
     ]);
     
-    const isRowLoaded = (d: any): boolean => {
+    const isRowLoaded = (d: Index): boolean => {
         return manufacturers ? !!manufacturers[d.index] : false;
     }
       
     const loadMoreRows = (d: IndexRange) => {
-        console.log('loadMoreRows', d);
-        dispatch(getFetchAllManufacturers(1));
-    //   return manufacturers;
-    return new Promise((res, rej) => {
-        console.log('loadMoreRows', d);
-        res();
-    });
+        return new Promise((res, rej) => { res(d); });
     }
       
-    const rowRenderer = (d: { key: string, index: number, style: any}) => {
+    const rowRenderer = (d: ListRowProps) => {
+        if ((d.index === totalLimit) && d.isVisible) {
+            dispatch(getFetchAllManufacturers(currentPage + 1));
+        } else if (d.index === 0 && d.isVisible && currentPage > 1) {
+            dispatch(getFetchAllManufacturers(1));
+        }
         if (manufacturers) {
             return (
                 <Grid container key={d.key} style={d.style}>
@@ -54,6 +61,9 @@ const ManufacturerListPage = (props: IManufacturerListPageProps) => {
                         <Link to={`/manufacturer-details/${manufacturers[d.index].name}`}>
                             <Button
                                 color="primary"
+                                onClick={() => {
+                                    dispatch(getManufacturerDetailsByName(manufacturers[d.index].name))
+                                }}
                             >
                                 Details
                             </Button>
@@ -69,23 +79,31 @@ const ManufacturerListPage = (props: IManufacturerListPageProps) => {
     return (
         <Grid container justify="center" alignItems="center" spacing={4}>
             <Grid item>
-                <InfiniteLoader
-                    isRowLoaded={isRowLoaded}
-                    loadMoreRows={loadMoreRows}
-                    rowCount={manufacturers?.length}
-                >
-                    {(data: { onRowsRendered: any, registerChild: any }) => (
-                    <List
-                        height={800}
-                        onRowsRendered={data.onRowsRendered}
-                        ref={data.registerChild}
-                        rowCount={manufacturers?.length || 0}
-                        rowHeight={50}
-                        rowRenderer={rowRenderer}
-                        width={800}
-                    />
-                    )}
-                </InfiniteLoader>
+                <div style={{ width: '100vw', height: '80vh'}}>
+                    <AutoSizer>
+                        {
+                            (d: { width: number, height: number }) => (
+                                <InfiniteLoader
+                                    isRowLoaded={isRowLoaded}
+                                    loadMoreRows={loadMoreRows}
+                                    rowCount={manufacturers?.length}
+                                >
+                                    {(data: InfiniteLoaderChildProps) => (
+                                        <List
+                                            height={d.height}
+                                            onRowsRendered={data.onRowsRendered}
+                                            ref={data.registerChild}
+                                            rowCount={manufacturers?.length || 0}
+                                            rowHeight={35}
+                                            rowRenderer={rowRenderer}
+                                            width={d.width}
+                                        />
+                                    )}
+                                </InfiniteLoader>
+                            )
+                        }
+                    </AutoSizer>
+                </div>
             </Grid>
         </Grid>
     )

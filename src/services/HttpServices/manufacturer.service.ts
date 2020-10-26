@@ -21,6 +21,33 @@ export interface IManufacturersResponse {
     SearchCriteria: string;
 }
 
+export interface IModelForMakeResponse {
+    Count: number;
+    Message: string;
+    Results: Array<IModelForMakeResultsItem>;
+    SearchCriteria: string;
+}
+
+export interface IMakeForManufacturerResponse {
+    Count: number;
+    Message: string;
+    Results: Array<IMakeForManufacturerResultsItem>;
+    SearchCriteria: string;
+}
+
+export interface IMakeForManufacturerResultsItem {
+    Make_ID: number;
+    Make_Name: string;
+    Mfr_Name: string;
+}
+
+export interface IModelForMakeResultsItem {
+    Make_ID: number;
+    Make_Name: string;
+    Model_ID: number;
+    Model_Name: string;    
+}
+
 const manufacturerTransformerData = (manufacturers: IManufacturersResultItem[])
 :IManufacturerListItem[] => {
     return manufacturers.map((m: IManufacturersResultItem) => {
@@ -32,6 +59,11 @@ const manufacturerTransformerData = (manufacturers: IManufacturersResultItem[])
     });
 }
 
+export interface IManufacturerService {
+    getAllManufacturers: (p: number) => Promise<IManufacturerListItem[]>;
+    getMakeForManufacturer: (m: string) => Promise<IModelForMakeResultsItem[]>;
+}
+
 class ManufacturerService {;
 
     public async getAllManufacturers(page: number = 1): Promise<IManufacturerListItem[]> {
@@ -40,6 +72,28 @@ class ManufacturerService {;
         };
         if (response && response.data) {
             return manufacturerTransformerData(response.data.Results);
+        } else {
+            return [];
+        }
+    }
+
+    public async getAllManufacturerModelForMake(name: string): Promise<IModelForMakeResultsItem[]> {
+        const response = await HttpService.get(`/getmodelsformake/${name}?format=json`) as {
+            data: IModelForMakeResponse,
+        };
+        if (response && response.data) {
+            return response.data.Results;
+        } else {
+            return [];
+        }
+    }
+
+    public async getAllManufacturerMakes(name: string): Promise<IMakeForManufacturerResultsItem[]> {
+        const response = await HttpService.get(`/GetMakeForManufacturer/${name}?format=json`) as {
+            data: IMakeForManufacturerResponse,
+        };
+        if (response && response.data) {
+            return response.data.Results;
         } else {
             return [];
         }

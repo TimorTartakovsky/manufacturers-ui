@@ -12,6 +12,8 @@ import manufacturerListReducer from './store/manufacturer.list.reducer';
 import createSagaMiddleware from "redux-saga";
 import { all } from 'redux-saga/effects';
 import allManufacturersListSagas from './saga/manufacturer.list.saga';
+import allManufacturersDetailsSagas from './saga/manufacturer.details.saga';
+import manufacturerDetailsReducer from './store/manufacturer.detail.reducer';
 
 declare global {
   interface Window {
@@ -22,13 +24,16 @@ declare global {
 function* allSaga() {
   yield all([
       ...allManufacturersListSagas,
+      ...allManufacturersDetailsSagas
   ]);
 }
 
-const composeEnhancers = (process.env.NODE_ENV === 'development' ? window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ : null) || compose;
+const composeEnhancers = (process.env.NODE_ENV === 'development' ?
+ window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ : null) || compose;
 
 const rootReducer = combineReducers({
   manufacturersList: manufacturerListReducer,
+  manufacturerDetails: manufacturerDetailsReducer,
 });
 
 const sagaMiddleware = createSagaMiddleware();

@@ -8,6 +8,8 @@ export const MANUFACTURER_ACTIONS_MAP: IActionsMap = {
     FETCH_ALL_MANUFACTURERS_FAIL: 'FETCH_ALL_MANUFACTURERS_FAIL',
 }
 
+
+// FETCH ALL MANUFACTURERES
 export const getFetchAllManufacturers = (page: number): IActionPayload => {
     return {
         type: MANUFACTURER_ACTIONS_MAP.FETCH_ALL_MANUFACTURERS_REQUEST,
@@ -21,11 +23,12 @@ export const getFetchAllManufacturersStart = (): IActionPayload => {
     }
 }
 
-export const getFetchAllManufacturersSuccess = (manufacturers: Array<IManufacturerListItem>)
-: IActionPayload => {
+export const getFetchAllManufacturersSuccess = (
+    manufacturers: Array<IManufacturerListItem>, currentPage: number
+): IActionPayload => {
     return {
         type: MANUFACTURER_ACTIONS_MAP.FETCH_ALL_MANUFACTURERS_SUCESS,
-        payload: { manufacturers }
+        payload: { manufacturers, currentPage }
     }
 }
 

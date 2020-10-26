@@ -11,12 +11,14 @@ export interface IManufacturerListState {
     manufacturers: Array<IManufacturerListItem> | null;
     isManufacturersLoadig: boolean;
     manufacturersLoadingError: Error | null,
+    currentPage: number,
 }
 
 const initialManufacturerListState: IManufacturerListState = {
     manufacturers: null,
     isManufacturersLoadig: false,
     manufacturersLoadingError: null,
+    currentPage: 0,
 }
 
 const manufacturerListReducer = ( state = initialManufacturerListState, action: IActionPayload ) => {
@@ -32,6 +34,7 @@ const manufacturerListReducer = ( state = initialManufacturerListState, action: 
                 isManufacturersLoadig: false,
                 manufacturers: action.payload!.manufacturers || [],
                 manufacturersLoadingError: null,
+                currentPage: action.payload!.currentPage || 1,
             }
         case MANUFACTURER_ACTIONS_MAP.FETCH_ALL_MANUFACTURERS_FAIL:
             return {
