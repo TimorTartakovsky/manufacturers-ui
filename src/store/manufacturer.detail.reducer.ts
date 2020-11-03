@@ -18,16 +18,19 @@ const initialManufacturerListState: IManufacturerDetailsState = {
 const manufacturerDetailsReducer = ( state = initialManufacturerListState, action: IActionPayload ) => {
     switch ( action.type ) {
         case MANUFACTURER_DETAIL_ACTIONS_MAP.FETCH_MANUFACTURERS_DETAILS_BY_NAME_START:
-            return state;
+            return {
+                ...state,
+                details: {},
+            };
         case MANUFACTURER_DETAIL_ACTIONS_MAP.FETCH_MANUFACTURERS_DETAILS_BY_NAME_SUCCESS:
             return {
                 ...state,
-                details: action.payload!.details || [],
+                details: action.payload!.details || {},
             }
         case MANUFACTURER_DETAIL_ACTIONS_MAP.FETCH_MANUFACTURERS_DETAILS_BY_NAME_FAIL:
             return {
                 ...state,
-                details: [],
+                details: {},
             }
         default: return state;
     }

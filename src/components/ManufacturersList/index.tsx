@@ -79,7 +79,13 @@ const ManufacturerListPage = (props: IManufacturerListPageProps) => {
     return (
         <Grid container justify="center" alignItems="center" spacing={4}>
             <Grid item>
-                <div style={{ width: '100vw', height: '80vh'}}>
+                <Grid container justify="space-between" alignItems="center">
+                    <Grid item xs={3}>ID</Grid>
+                    <Grid item xs={3}>COMMON NAME</Grid>
+                    <Grid item xs={3}>COUNTRY</Grid>
+                    <Grid item xs={3}>DETAILS</Grid>
+                </Grid>
+                <div style={{ width: '70vw', height: '80vh'}}>
                     <AutoSizer>
                         {
                             (d: { width: number, height: number }) => (

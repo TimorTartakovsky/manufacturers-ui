@@ -1,9 +1,8 @@
 import React from 'react';
 import * as H from 'history';
 import { IManufacturerDetailsItem } from '../../store/manufacturer.detail.reducer';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { getManufacturerDetailsArray } from '../../selectors/manufacturer.detail.selector';
-import { getManufacturerDetailsByName } from '../../actions/manufacturer.detail.actions';
 import {
     IndexRange, InfiniteLoader, List, AutoSizer, InfiniteLoaderChildProps, Index, ListRowProps,
 } from 'react-virtualized';
@@ -21,11 +20,8 @@ export interface IManufacturerEditPageProps {
 
 const ManufacturerDetailsPage = (props: IManufacturerEditPageProps) => {
 
-    // const manufacturerName: string = props.match.params.name;
-    // const dispatch = useDispatch();
     const details = useSelector(getManufacturerDetailsArray);
-    console.log('details', details);
-
+    
     const isRowLoaded = (d: Index): boolean => {
         return details ? !!details[d.index] : false;
     }
@@ -64,6 +60,11 @@ const ManufacturerDetailsPage = (props: IManufacturerEditPageProps) => {
     return (
         <Grid container justify="center" alignItems="center" spacing={4}>
             <Grid item>
+                <Grid container justify="space-between" alignItems="center">
+                    <Grid item xs={4}>MANUFACTURER</Grid>
+                    <Grid item xs={4}>MODEL NAMES</Grid>
+                    <Grid item xs={4}>MAKES</Grid>
+                </Grid>
                 <div style={{ width: '60vw', height: '80vh'}}>
                     <AutoSizer>
                         {
@@ -79,7 +80,15 @@ const ManufacturerDetailsPage = (props: IManufacturerEditPageProps) => {
                                             onRowsRendered={data.onRowsRendered}
                                             ref={data.registerChild}
                                             rowCount={details?.length || 0}
-                                            rowHeight={200}
+                                            rowHeight={(i: Index) => {
+                                                if(!details || !details.length) {
+                                                    return 0;
+                                                }
+                                                const elem: IManufacturerDetailsItem = details[i.index];
+                                                const max = (elem.manufaturers.length > elem.mopdelNames.length) ?
+                                                    (elem.manufaturers.length / 2) : (elem.mopdelNames.length / 2);
+                                                return (max < 100) ? 100 : max;
+                                            }}
                                             rowRenderer={rowRenderer}
                                             width={d.width}
                                         />
